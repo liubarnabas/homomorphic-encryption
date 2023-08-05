@@ -1,14 +1,20 @@
-FROM ubuntu:16.04
+# Use the official Python image as the base image
+FROM python:3.10-slim
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-&& apt-get upgrade -y
-RUN apt-get install -y python3  \
-&& apt-get install -y python3-pip
-RUN pip3 install Flask-API \
-&& pip3 install flask_cors \
-&& pip3 install requests
-
-COPY . /app
+# Set the working directory within the container
 WORKDIR /app
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+
+# Copy the requirements.txt file first to leverage Docker caching
+COPY requirements.txt .
+
+# Install the required Python packages using pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application files to the container
+COPY . /app
+
+# Expose the port on which your Flask app will be listening (change to the appropriate port)
+EXPOSE 7000
+
+# Set the entrypoint to run the Flask app
+ENTRYPOINT ["python", "app.py"]
